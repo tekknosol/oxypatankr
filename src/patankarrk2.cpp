@@ -28,7 +28,8 @@ DataFrame o2_model_patankarrk2_cpp(NumericVector times, NumericVector y, Numeric
   int dt = 1;
   vec MichaelisMenten(1), ArrheniusCorrection(1), cO2_vec(1);
   vec SedimentFlux(1);
-  double p0 = 1e-10, d0, ydat, c_rep, p1 = 1e-10, d1, p = 0.5 * (p0 + p1), d = 0.5 * (p0 + p1), cproxy_d;
+  // double p0 = 1e-10, d0, ydat, c_rep, p1 = 1e-10, d1, p = 0.5 * (p0 + p1), d = 0.5 * (p0 + p1), cproxy_d;
+  double p0 = 1e-10, d0, ydat, c_rep, p1 = 1e-10, d1, p, d, cproxy_d;
   double it_flux, it_khalf, it_theta;
   vec cproxy;
   // mat eye(len_y0, len_y0, fill::ones);
@@ -40,6 +41,9 @@ DataFrame o2_model_patankarrk2_cpp(NumericVector times, NumericVector y, Numeric
   DataFrame df;
 
   dcO2.row(0) = cO20;
+
+  p = 0.5 * (p0 + p1);
+  d = 0.5 * (p0 + p1);
 
 
   for (k = 0; k < iterations; k++){
@@ -60,7 +64,7 @@ DataFrame o2_model_patankarrk2_cpp(NumericVector times, NumericVector y, Numeric
         MichaelisMenten[0] = ((dcO2(i - 1, k)) / (it_khalf + dcO2(i - 1, k)));
         ArrheniusCorrection[0] = pow(it_theta, (Temp_linear[i] - 20));
 
-        // p0 = 1e-10;
+         p0 = 1e-10;
         d0 = std::abs(SedimentFlux[0] * MichaelisMenten[0] * ArrheniusCorrection[0] / Volume_linear[i]);
 
 
@@ -81,11 +85,11 @@ DataFrame o2_model_patankarrk2_cpp(NumericVector times, NumericVector y, Numeric
         MichaelisMenten[0] = ((cproxy_d) / (it_khalf + cproxy_d));
         ArrheniusCorrection[0] = pow(it_theta, (Temp_linear[i] - 20));
 
-        // p1 = 1e-10;
+         p1 = 1e-10;
         d1 =  std::abs(SedimentFlux[0] * MichaelisMenten[0] * ArrheniusCorrection[0] / Volume_linear[i]);
 
-        // p = 0.5 * (p0 + p1);
-        // d = 0.5 * (d0 + d1);
+         p = 0.5 * (p0 + p1);
+         d = 0.5 * (d0 + d1);
 
         avec.fill(dt * d / cproxy_d + 1);
 
